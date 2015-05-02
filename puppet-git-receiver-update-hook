@@ -18,17 +18,6 @@ function cleanup_and_error {
 
 set -o pipefail
 
-# Act as an external node classifier if necessary
-if env | grep --quiet "PUPPET_ENC_FILE" ; then
-		sleep 1 # Without this sleep, puppet randomly hangs
-		if [ -e "$PUPPET_ENC_FILE" ] ; then
-				cat $PUPPET_ENC_FILE
-		else
-				echo -e "classes:\n"
-		fi
-		exit 0
-fi
-
 DEST=
 
 # git branch to consider for puppet
@@ -133,61 +122,14 @@ fi
 
 manifest_file="${DEST}/manifests/site.pp"
 
-fqdn=`facter fqdn`
-enc_file="${DEST}/manifests/nodes/${fqdn}.yml"
-
-if [ ! -e $enc_file ] ; then
-		enc_file="${DEST}/manifests/site.yml"
-fi
-
-if [ ! -e $enc_file ] ; then
-		enc_file=""
-fi
-
-if [ ! -e $manifest_file -a ! -e "$enc_file" ] ; then
+if [ ! -e $manifest_file ] ; then
 		notice "No puppet manifest detected"
 		cleanup
 		exit 0
 fi
 
-# Make a blank manifest if necessary
-if [ ! -e $manifest_file ] ; then
-		touch $manifest_file
-fi
-
-if [ -e "$enc_file" ] ; then
-		notice "Using external node classification file ${enc_file//$DEST\/}"
-fi
-
-confdir="${DEST}/puppet-confdir"
-mkdir -p $confdir/ssl
-
-cat <<EOF > "${confdir}/puppet.conf"
-[main]
-  node_terminus = exec
-  external_nodes = `pwd`/$0
-  templatedir=${DEST}/templates
-EOF
-
-if [ -e "${DEST}/hiera" ] ; then
-		cat <<EOF > "${confdir}/hiera.yaml"
----
-:backends: - yaml
-           - puppet
-:hierarchy: - %{hostname}
-            - %{fqdn}
-            - %{domain}
-            - %{ec2_placement_availability_zone}
-            - default
-:yaml:
-        :datadir: ${DEST}/hiera
-:puppet:
-    :datasource: data
-EOF
-fi
-
 notice "Applying puppet manifests"
-sudo -H PUPPET_ENC_FILE=$enc_file puppet apply --confdir=${confdir} $full_puppet_options --detailed-exitcodes --modulepath=${module_path} $manifest_file |& sed -u "s,$DEST/,,g"
+sudo puppet apply $full_puppet_options --detailed-exitcodes --modulepath=${module_path} $manifest_file |& sed -u "s,$DEST/,,g"
 
 PUPRET=$?
 if ! [ $PUPRET -eq 0 -o $PUPRET -eq 2 ] ; then
