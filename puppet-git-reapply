@@ -1,10 +1,9 @@
 #!/usr/bin/env sh
+
 set -e
-export GIT_DIR=/var/lib/puppet-git-receiver.git
-cd ${GIT_DIR}
-if [ "$1" = '--update' ]
-then
-  git fetch -v
-fi
-./hooks/update \
-  refs/heads/master dummy HEAD
+
+export GIT_DIR=/var/puppet-git-receiver/puppet.git
+
+[ "$1" = '--update' ] && git fetch -v
+
+/var/puppet-git-receiver/puppet.git/hooks/update refs/heads/master dummy HEAD
