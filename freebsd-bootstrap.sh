@@ -54,5 +54,11 @@ fi
 mkdir -p "$PGR_HOME/.ssh"
 curl -so "$PGR_HOME/.ssh/authorized_keys" "http://caius.name/_sshkey.txt"
 
+# Move cache somewhere semi-persistent (as we're running git hook in temp dir)
+mkdir -p "$PGR_HOME/.librarian/puppet"
+echo '---
+LIBRARIAN_PUPPET_TMP: "/tmp"
+' > "$PGR_HOME/.librarian/puppet/config"
+
 # Tidy up permissions
 chown -R $PGR_USER:$PGR_GROUP $PGR_HOME
