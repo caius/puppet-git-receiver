@@ -65,7 +65,7 @@ puppetver=$(facter puppetversion)
 if [[ $puppetver == 2.6.* || $puppetver == 0.2* ]] ; then
 		validate_command="xargs -n1 puppet --parseonly"
 else
-		validate_command="xargs puppet parser validate"
+		validate_command="xargs puppet parser validate $full_puppet_options"
 fi
 
 DEST=$(mktemp -d -t puppet-git-receiver)
