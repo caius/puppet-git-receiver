@@ -116,7 +116,7 @@ if [ -e "${DEST}/Puppetfile" ] ; then
 	else
 		notice "Installing librarian-puppet modules"
 		lp_options=$(git config puppet-receiver.librarian-puppet-args)
-		(cd $DEST; librarian-puppet install $lp_options)
+		(cd $DEST; librarian-puppet install $lp_options) || cleanup_and_error 1 "Error installing Puppetfile"
 	fi
 fi
 
