@@ -79,7 +79,10 @@ else
 		validate_command="xargs --no-run-if-empty puppet parser validate"
 fi
 
-DEST=$(mktemp -d --suffix=.puppet-git-receiver)
+DEST=$(mktemp -d -t puppet-git-receiver)
+if [[ ! $? -eq 0 ]] ; then
+  cleanup_and_error 1 "Cannot create temp dir"
+fi
 module_path="${DEST}/modules"
 
 if ! git archive --format=tar $newrev | (cd $DEST && tar xf -) ; then
