@@ -120,7 +120,7 @@ if [ -e "${DEST}/Puppetfile" ] ; then
 	fi
 fi
 
-manifest_file="${DEST}/manifests/site.pp"
+manifest_file="${DEST}/manifests"
 
 if [ ! -e $manifest_file ] ; then
 		notice "No puppet manifest detected"
