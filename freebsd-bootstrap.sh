@@ -7,6 +7,10 @@ set -e
 
 # Install dependencies
 pkg install -y bash git puppet sudo
+gem install librarian-puppet
+
+# Sort out SSL certs for ruby's openssl or librarian-puppet can't work
+[ -f /etc/ssl/cert.pem ] || ln -sf /etc/ssl/cert.pem /usr/local/etc/ssl/cert.pem
 
 BRANCH="freebsd"
 REPO="https://github.com/caius/puppet-git-receiver.git"
