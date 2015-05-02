@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 set -e
 export GIT_DIR=/var/lib/puppet-git-receiver.git
 cd ${GIT_DIR}

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 function msg { echo -e "\E[${COLOUR}m$@\E[0m" >&2 ; }
 function notice { COLOUR="0;36" msg "notice: $@" ; }
@@ -91,7 +91,7 @@ skip_validation=$(git config --bool puppet-receiver.skip-validation)
 if [ "$skip_validation" == "true" ] ; then
 		notice "Skipping puppet validation due to config option puppet-receiver.skip-validation"
 else
-		notice "Validating puppet manifests for $refname"		
+		notice "Validating puppet manifests for $refname"
 		if ! find $DEST -name "*.pp" | $validate_command |& sed -u "s,$DEST/,,g" ; then
 				cleanup_and_error 1 "Encountered a problem validating the puppet manifests"
 		fi
