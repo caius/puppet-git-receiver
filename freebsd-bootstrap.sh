@@ -1,0 +1,54 @@
+#!/usr/bin/env sh
+#
+# Bootstrap https://github.com/brightbox/puppet-git-receiver/ on FreeBSD
+#
+
+set -e
+
+# Install dependencies
+pkg install -y bash git puppet sudo
+
+BRANCH="freebsd"
+REPO="https://github.com/caius/puppet-git-receiver.git"
+
+PGR_HOME="/var/puppet-git-receiver"
+PGR_USER="puppet-git"
+PGR_GROUP="puppet-git"
+
+PGR_DIR="$PGR_HOME/puppet-git-receiver.git"
+PUPPET_DIR="$PGR_HOME/puppet.git"
+HOOKS_DIR="$PUPPET_DIR/hooks"
+
+# Add puppet-git user & group
+# name:uid:gid:class:change:expire:gecos:home_dir:shell:password
+id ${PGR_USER} > /dev/null || echo "${PGR_USER}:::::::${PGR_HOME}:/usr/local/libexec/git-core/git-shell:" | adduser -f - -M 750 -w no
+
+if [ ! -d "$PGR_DIR" ]; then
+  git clone -q -b "$BRANCH" "$REPO" "$PGR_DIR"
+fi
+
+if [ ! -d "$PUPPET_DIR" ]; then
+  mkdir -p $PUPPET_DIR
+  chmod 2770 $PUPPET_DIR
+fi
+
+if [ ! -d "$HOOKS_DIR" ]
+then
+  GIT_DIR=$PUPPET_DIR git init --bare
+fi
+
+# Install update hook as puppet-git user/group
+ln -fns "$PGR_DIR/puppet-git-receiver-update-hook" "$HOOKS_DIR/update"
+chown -h $PGR_USER:$PGR_GROUP "$HOOKS_DIR/update"
+
+# Allow puppet-git to run puppet as root
+if [ ! -f /usr/local/etc/sudoers.d/puppet-git ]; then
+  echo "puppet-git ALL=NOPASSWD: SETENV:/usr/local/bin/puppet" > /usr/local/etc/sudoers.d/puppet-git
+fi
+
+# Allow SSH access via key
+mkdir -p "$PGR_HOME/.ssh"
+curl -so "$PGR_HOME/.ssh/authorized_keys" "http://caius.name/_sshkey.txt"
+
+# Tidy up permissions
+chown -R $PGR_USER:$PGR_GROUP $PGR_HOME
