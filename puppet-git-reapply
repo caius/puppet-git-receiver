@@ -6,4 +6,4 @@ export GIT_DIR=/var/puppet-git-receiver/puppet.git
 
 [ "$1" = '--update' ] && sudo -E -u puppet-git git fetch -v
 
-sudo -E -u puppet-git /var/puppet-git-receiver/puppet.git/hooks/update refs/heads/master dummy HEAD
+sudo -HE -u puppet-git /var/puppet-git-receiver/puppet.git/hooks/update refs/heads/master dummy HEAD
