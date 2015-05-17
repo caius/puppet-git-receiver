@@ -25,7 +25,7 @@ HOOKS_DIR="$PUPPET_DIR/hooks"
 
 # Add puppet-git user & group
 # name:uid:gid:class:change:expire:gecos:home_dir:shell:password
-id ${PGR_USER} > /dev/null || echo "${PGR_USER}:::::::${PGR_HOME}:/usr/local/libexec/git-core/git-shell:" | adduser -f - -M 750 -w no
+id ${PGR_USER} > /dev/null 2>&1 || echo "${PGR_USER}:::::::${PGR_HOME}:/usr/local/libexec/git-core/git-shell:" | adduser -f - -M 750 -w no
 
 if [ ! -d "$PGR_DIR" ]; then
   git clone -q -b "$BRANCH" "$REPO" "$PGR_DIR"
