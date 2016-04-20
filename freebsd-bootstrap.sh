@@ -6,7 +6,7 @@
 set -e
 
 # Install dependencies
-pkg install -y bash git puppet sudo
+pkg install -y bash git puppet38 sudo
 gem install --no-rdoc --no-ri librarian-puppet
 
 # Sort out SSL certs for ruby's openssl or librarian-puppet can't work
